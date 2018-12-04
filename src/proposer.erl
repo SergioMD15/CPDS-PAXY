@@ -55,7 +55,7 @@ collect(0, _, _, Proposal) ->
 collect(N, Round, MaxVoted, Proposal) ->
   receive 
     {promise, Round, _, na} ->
-      collect(N, Round, MaxVoted, Proposal);
+      collect(N-1, Round, MaxVoted, Proposal);
     {promise, Round, Voted, Value} ->
       case order:gr(Voted, MaxVoted) of
         true ->
