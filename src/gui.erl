@@ -2,12 +2,12 @@
 -export([start/2]).
 -include_lib("wx/include/wx.hrl").
 
--define(WindowSize, {450, 420}).
--define(PanelSize, {175, 40}).
--define(OuterSizerMinWidth, 190).
--define(OuterSizerMaxHeight, 420).	% maximum sizer size
--define(InSizerMinWidth, 175).
--define(InSizerMinHeight, 40).
+-define(WindowSize, {600, 600}).
+-define(PanelSize, {250, 70}).
+-define(OuterSizerMinWidth, 250).
+-define(OuterSizerMaxHeight, 500).	% maximum sizer size
+-define(InSizerMinWidth, 200).
+-define(InSizerMinHeight, 60).
 -define(PropTitle, "Proposers").
 -define(PropText1, "Round:").
 -define(AccTitle, "Acceptors").
