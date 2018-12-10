@@ -1,5 +1,5 @@
 -module(paxy).
--export([start/1, stop/0, stop/1]).
+-export([start/1, start/0, stop/0, stop/1]).
 
 -define(RED, {255,0,0}).
 -define(BLUE, {0,0,255}).
@@ -22,6 +22,10 @@ start(Sleep) ->
       start_proposers(PropIds, PropInfo, AccRegister, Sleep)
   end,
   true.
+
+start() ->
+  Sleep = [1,1,1],
+  start(Sleep).
     
 start_acceptors(AccIds, AccReg) ->
   case AccIds of
