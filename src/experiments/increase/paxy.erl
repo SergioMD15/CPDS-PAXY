@@ -75,6 +75,16 @@ stop() ->
   stop(c),
   stop(d),
   stop(e),
+  stop(f),
+  stop(g),
+  stop(h),
+  stop(i),
+  stop(j),
+  stop(k),
+  stop(l),
+  stop(m),
+  stop(n),
+  stop(o),
   stop(gui).
 
 stop(Name) ->
@@ -84,5 +94,3 @@ stop(Name) ->
     Pid ->
       Pid ! stop
   end.
-
- 
