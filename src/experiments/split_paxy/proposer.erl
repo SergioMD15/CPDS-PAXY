@@ -1,23 +1,23 @@
 -module(proposer).
--export([start/5]).
+-export([start/6]).
 
 -define(timeout, 2000).
 -define(backoff, 10).
 
-start(Name, Proposal, Acceptors, Sleep, PanelId) ->
-  spawn(fun() -> init(Name, Proposal, Acceptors, Sleep, PanelId) end).
+start(Name, Proposal, Acceptors, Sleep, PanelId, AccepNode) ->
+  spawn(fun() -> init(Name, Proposal, Acceptors, Sleep, PanelId, AccepNode) end).
 
-init(Name, Proposal, Acceptors, Sleep, PanelId) ->
+init(Name, Proposal, Acceptors, Sleep, PanelId, AccepNode) ->
   timer:sleep(Sleep),
   Round = order:first(Name),
-  round(Name, ?backoff, Round, Proposal, Acceptors, PanelId).
+  round(Name, ?backoff, Round, Proposal, Acceptors, PanelId, AccepNode).
 
-round(Name, Backoff, Round, Proposal, Acceptors, PanelId) ->
+round(Name, Backoff, Round, Proposal, Acceptors, PanelId, AccepNode) ->
   io:format("[Proposer ~w] Phase 1: round ~w proposal ~w~n", 
              [Name, Round, Proposal]),
   % Update gui
   PanelId ! {updateProp, "Round: " ++ io_lib:format("~p", [Round]), Proposal},
-  case ballot(Name, Round, Proposal, Acceptors, PanelId) of
+  case ballot(Name, Round, Proposal, Acceptors, PanelId, AccepNode) of
     {ok, Decision} ->
       io:format("[Proposer ~w] DECIDED ~w in round ~w~n", 
                  [Name, Decision, Round]),
@@ -26,11 +26,11 @@ round(Name, Backoff, Round, Proposal, Acceptors, PanelId) ->
     abort ->
       timer:sleep(rand:uniform(Backoff)),
       Next = order:inc(Round),
-      round(Name, (2*Backoff), Next, Proposal, Acceptors, PanelId)
+      round(Name, (2*Backoff), Next, Proposal, Acceptors, PanelId, AccepNode)
   end.
 
-ballot(Name, Round, Proposal, Acceptors, PanelId) ->
-  prepare(Round, Acceptors),
+ballot(Name, Round, Proposal, Acceptors, PanelId, AccepNode) ->
+  prepare(Round, Acceptors, AccepNode),
   Quorum = (length(Acceptors) div 2) + 1,
   MaxVoted = order:null(),
   case collect(Quorum, Round, MaxVoted, Proposal) of
@@ -39,7 +39,7 @@ ballot(Name, Round, Proposal, Acceptors, PanelId) ->
                  [Name, Round, Value, Proposal]),
       % update gui
       PanelId ! {updateProp, "Round: " ++ io_lib:format("~p", [Round]), Value},
-      accept(Round, Value, Acceptors),
+      accept(Round, Value, Acceptors, AccepNode),
       case vote(Quorum, Round) of
         ok ->
           {ok, Value};
@@ -89,17 +89,17 @@ vote(N, Round) ->
     abort
   end.
 
-prepare(Round, Acceptors) ->
+prepare(Round, Acceptors, AccepNode) ->
   Fun = fun(Acceptor) -> 
-    send(Acceptor, {prepare, self(), Round}) 
+    send(Acceptor, {prepare, self(), Round}, AccepNode) 
   end,
   lists:foreach(Fun, Acceptors).
 
-accept(Round, Proposal, Acceptors) ->
+accept(Round, Proposal, Acceptors, AccepNode) ->
   Fun = fun(Acceptor) -> 
-    send(Acceptor, {accept, self(), Round, Proposal}) 
+    send(Acceptor, {accept, self(), Round, Proposal}, AccepNode) 
   end,
   lists:foreach(Fun, Acceptors).
 
-send(Name, Message) ->
-  Name ! Message.
+send(Name, Message, AccepNode) ->
+  {Name, AccepNode} ! Message.

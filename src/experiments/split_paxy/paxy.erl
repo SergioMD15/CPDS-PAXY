@@ -59,7 +59,7 @@ startProposers(PropIds, PropInfo, Acceptors, Sleep, AccepNode) ->
 		[PropId|Rest] ->
 			[{RegName, Colour}|RestInfo] = PropInfo,
 			[FirstSleep|RestSleep] = Sleep,
-			proposer:start(RegName, Colour, Acceptors, FirstSleep, PropId),
+			proposer:start(RegName, Colour, Acceptors, FirstSleep, PropId, AccepNode),
 			startProposers(Rest, RestInfo, Acceptors, RestSleep, AccepNode)
 		end.
 
