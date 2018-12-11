@@ -194,7 +194,7 @@ create_proposers(ProposerList, Panel, ProposerSizer, Env) ->
     wxSizer:add(ProposerSizerIn, ProposerPanel),
     wxSizer:add(ProposerSizer, ProposerSizerIn),
     StaticBox = wxStaticBoxSizer:getStaticBox(ProposerSizerIn),
-    wxStaticText:setForegroundColour(StaticBox, ?wxWHITE),
+    wxStaticText:setForegroundColour(StaticBox, ?wxBLACK),
     {ProposerPanel, ProposerSizerIn, Lb1}
   end,
   ProposerList),
